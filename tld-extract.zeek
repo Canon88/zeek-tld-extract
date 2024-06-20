@@ -20,7 +20,9 @@ export {
     option second_TLD_set: set[string] = set();
     option third_TLD_set: set[string] = set();
     option fourth_TLD_set: set[string] = set();
+    option trusted_tlds_set: set[string] = set();
     option trusted_domains_set: set[string] = set();
+    option trusted_querys_set: set[string] = set();
 }
 
 # Define regex pattern placeholders to find TLDs
@@ -46,8 +48,14 @@ const extraction_regex: table[count] of pattern = {
 type Idx: record {
     tld: string;
 };
+type Idx_tld: record {
+    trusted_domain: string;
+};
 type Idx_td: record {
     trusted_domain: string;
+};
+type Idx_tq: record {
+    trusted_query: string;
 };
 
 # Global sets to hold TLD data
@@ -55,7 +63,9 @@ global first_TLD_dat: set[string] = set();
 global second_TLD_dat: set[string] = set();
 global third_TLD_dat: set[string] = set();
 global fourth_TLD_dat: set[string] = set();
+global trusted_querys_dat: set[string] = set();
 global trusted_domains_dat: set[string] = set();
+global trusted_tlds_dat: set[string] = set();
 global config_path: string = "./";
 
 event zeek_init() &priority=10 {
@@ -64,7 +74,9 @@ event zeek_init() &priority=10 {
     Input::add_table([$source=config_path + "2nd_level_public.dat", $name="second_TLD_dat", $idx=Idx, $destination=second_TLD_dat, $mode=Input::REREAD]);
     Input::add_table([$source=config_path + "3rd_level_public.dat", $name="third_TLD_dat", $idx=Idx, $destination=third_TLD_dat, $mode=Input::REREAD]);
     Input::add_table([$source=config_path + "4th_level_public.dat", $name="fourth_TLD_dat", $idx=Idx, $destination=fourth_TLD_dat, $mode=Input::REREAD]);
+    Input::add_table([$source=config_path + "trusted_tlds.dat", $name="trusted_tlds_dat", $idx=Idx_tld, $destination=trusted_tlds_dat, $mode=Input::REREAD]);
     Input::add_table([$source=config_path + "trusted_domains.dat", $name="trusted_domains_dat", $idx=Idx_td, $destination=trusted_domains_dat, $mode=Input::REREAD]);
+    Input::add_table([$source=config_path + "trusted_querys.dat", $name="trusted_querys_dat", $idx=Idx_tq, $destination=trusted_querys_dat, $mode=Input::REREAD]);
 
     # Convert TLD sets to regex patterns
     effective_tlds_1st_level = set_to_regex(first_TLD_dat, "\\.(~~)$");
@@ -157,8 +169,16 @@ event Input::end_of_data(name: string, source: string) {
         Config::set_value("TldExtract::fourth_TLD_set", fourth_TLD_dat);
     }
 
+    if (name == "trusted_tlds_dat") {
+        Config::set_value("TldExtract::trusted_tlds_set", trusted_tlds_dat);
+    }
+
     if (name == "trusted_domains_dat") {
         Config::set_value("TldExtract::trusted_domains_set", trusted_domains_dat);
+    }
+
+    if (name == "trusted_querys_dat") {
+        Config::set_value("TldExtract::trusted_querys_set", trusted_querys_dat);
     }
 }
 ## end set_to_regex

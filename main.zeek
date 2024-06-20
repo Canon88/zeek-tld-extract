@@ -34,8 +34,8 @@ event dns_request(c: connection, msg: dns_msg, query: string, qtype: count, qcla
     # Check if the domain is trusted
     if ((c$dns$domain == "local") || 
         (c$dns$domain == "in-addr.arpa") || 
-        (c$dns$domain in TldExtract::trusted_domains_set)
-        (c$dns$tld in TldExtract::trusted_tlds_set)
+        (c$dns$domain in TldExtract::trusted_domains_set) || 
+        (c$dns$tld in TldExtract::trusted_tlds_set) || 
         (query in TldExtract::trusted_querys_set)) {
         c$dns$is_trusted_domain = T;
     }

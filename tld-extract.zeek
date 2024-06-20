@@ -49,7 +49,7 @@ type Idx: record {
     tld: string;
 };
 type Idx_tld: record {
-    trusted_domain: string;
+    trusted_tld: string;
 };
 type Idx_td: record {
     trusted_domain: string;

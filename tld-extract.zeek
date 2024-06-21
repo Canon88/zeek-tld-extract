@@ -66,7 +66,7 @@ global fourth_TLD_dat: set[string] = set();
 global trusted_querys_dat: set[string] = set();
 global trusted_domains_dat: set[string] = set();
 global trusted_tlds_dat: set[string] = set();
-global config_path: string = "./";
+global config_path: string = "/usr/local/zeek/share/zeek/site/input_files/";
 
 event zeek_init() &priority=10 {
     # Add input tables to read TLD data and trusted domains data

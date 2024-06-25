@@ -9,22 +9,25 @@ redef record DNS::Info += {
 # Event to handle DNS requests
 event dns_request(c: connection, msg: dns_msg, query: string, qtype: count, qclass: count)
     {
+    if ( ! c?$dns )
+        return;
+    
     # Check if the query domain is in the top N table
-    if ( query in DomainRank::top_n_table )
+    if ( query in top_n_table )
         {
         # Assign the rank from the top N table to the DNS connection's rank field
-        c$dns$rank = DomainRank::top_n_table[query]$rank;
+        c$dns$rank = top_n_table[query]$rank;
         }
     # Check if the domain part of the DNS connection is in the top N table
-    else if ( c$dns$domain in DomainRank::top_n_table )
+    else if ( (c$dns?$domain) && (c$dns$domain in top_n_table) )
         {
         # Assign the rank from the top N table to the DNS connection's rank field
-        c$dns$rank = DomainRank::top_n_table[c$dns$domain]$rank;
+        c$dns$rank = top_n_table[c$dns$domain]$rank;
         }
     # Check if the top-level domain part of the DNS connection is in the top N table
-    else if ( c$dns$tld in DomainRank::top_n_table )
+    else if ( (c$dns?$tld) && (c$dns$tld in top_n_table) )
         {
         # Assign the rank from the top N table to the DNS connection's rank field
-        c$dns$rank = DomainRank::top_n_table[c$dns$tld]$rank;
+        c$dns$rank = top_n_table[c$dns$tld]$rank;
         }
     }
